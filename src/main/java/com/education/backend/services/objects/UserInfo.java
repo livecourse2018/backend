@@ -1,4 +1,4 @@
-package com.demo.rtc.services.objects;
+package com.education.backend.services.objects;
 
 public class UserInfo {
     private String email;

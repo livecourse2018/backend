@@ -1,4 +1,4 @@
-package com.demo.rtc.resources;
+package com.education.backend.resources;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;

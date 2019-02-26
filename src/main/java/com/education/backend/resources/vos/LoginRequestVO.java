@@ -1,4 +1,4 @@
-package com.demo.rtc.resources;
+package com.education.backend.resources.vos;
 
 public class LoginRequestVO {
     private String email;

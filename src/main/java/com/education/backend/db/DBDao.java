@@ -1,8 +1,9 @@
-package com.demo.rtc.db;
+package com.education.backend.db;
 
-import com.demo.rtc.resources.CourseVO;
-import com.demo.rtc.resources.SignupRequestVO;
-import com.demo.rtc.services.objects.RegistrationInfo;
+import com.education.backend.db.model.User;
+import com.education.backend.resources.vos.CourseVO;
+import com.education.backend.resources.vos.SignupRequestVO;
+import com.education.backend.db.model.CourseRegistration;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class DBDao implements DBClient {
     private ResultSet resultSet;
 
     @Override
-    public UserVO loginWithPassword(String email, String password) {
+    public User loginWithPassword(String email, String password) {
         prepareDatabase();
         String sqlQuery = "SELECT first_name, last_name, display_name, email FROM user WHERE email='"
                 + email
@@ -54,12 +55,12 @@ public class DBDao implements DBClient {
     }
 
     @Override
-    public RegistrationInfo getRegisteredCourses(String email) {
+    public CourseRegistration getRegisteredCourses(String email) {
         prepareDatabase();
         String sqlQuery = "SELECT course_id FROM registration WHERE email='"
                 + email
                 + "';";
-        return new RegistrationInfo(email, getRegistration(sqlQuery));
+        return new CourseRegistration(email, getRegistration(sqlQuery));
     }
 
     @Override
@@ -108,7 +109,7 @@ public class DBDao implements DBClient {
     }
 
     @Override
-    public UserVO findUser(String email) {
+    public User findUser(String email) {
         prepareDatabase();
         String sqlQuery = "SELECT first_name, last_name, display_name, email FROM user WHERE email='"
                 + email
@@ -215,14 +216,14 @@ public class DBDao implements DBClient {
         runUpdate(preparedStatement, sqlCreateCourseTable, true);
     }
 
-    private UserVO getUserInfo(String sqlQuery) {
+    private User getUserInfo(String sqlQuery) {
         try {
             connection = getConnection(true);
             preparedStatement = connection.prepareStatement(sqlQuery);
             resultSet = runQuery(preparedStatement);
 
             if (resultSet.first()) {
-                return new UserVO(
+                return new User(
                         resultSet.getString("first_name"),
                         resultSet.getString("last_name"),
                         resultSet.getString("display_name"),

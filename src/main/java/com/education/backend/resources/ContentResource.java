@@ -1,8 +1,8 @@
-package com.demo.rtc.resources;
+package com.education.backend.resources;
 
-import com.demo.rtc.services.ContentService;
-import com.demo.rtc.services.impl.ContentServiceImpl;
-import com.demo.rtc.services.objects.RegistrationInfo;
+import com.education.backend.resources.vos.CourseVO;
+import com.education.backend.services.ContentService;
+import com.education.backend.services.impl.ContentServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -10,7 +10,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 @Path("/content")

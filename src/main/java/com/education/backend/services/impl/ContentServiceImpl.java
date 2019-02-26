@@ -1,13 +1,12 @@
-package com.demo.rtc.services.impl;
+package com.education.backend.services.impl;
 
-import com.demo.rtc.db.DBClient;
-import com.demo.rtc.db.DBDao;
-import com.demo.rtc.resources.CourseVO;
-import com.demo.rtc.services.ContentService;
-import com.demo.rtc.services.objects.RegistrationInfo;
+import com.education.backend.db.DBClient;
+import com.education.backend.db.DBDao;
+import com.education.backend.resources.vos.CourseVO;
+import com.education.backend.services.ContentService;
+import com.education.backend.db.model.CourseRegistration;
 
 public class ContentServiceImpl implements ContentService {
-
     DBClient dbClient = new DBDao();
 
     @Override
@@ -16,7 +15,7 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public RegistrationInfo getRegisteredCourses(String email) {
+    public CourseRegistration getRegisteredCourses(String email) {
         return dbClient.getRegisteredCourses(email);
     }
 

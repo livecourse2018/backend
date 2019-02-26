@@ -1,4 +1,4 @@
-package com.demo.rtc.resources;
+package com.education.backend.resources;
 
 public class FailureResponse {
     private int errorCode;

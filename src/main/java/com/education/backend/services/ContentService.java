@@ -1,12 +1,12 @@
-package com.demo.rtc.services;
+package com.education.backend.services;
 
-import com.demo.rtc.resources.CourseVO;
-import com.demo.rtc.services.objects.RegistrationInfo;
+import com.education.backend.resources.vos.CourseVO;
+import com.education.backend.db.model.CourseRegistration;
 
 public interface ContentService {
     boolean getUserCourseRegistrationStatus(String email, String courseId);
 
-    RegistrationInfo getRegisteredCourses(String email);
+    CourseRegistration getRegisteredCourses(String email);
 
     boolean registerCourse(String email, String courseId);
 

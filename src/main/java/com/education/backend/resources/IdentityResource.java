@@ -1,8 +1,10 @@
-package com.demo.rtc.resources;
+package com.education.backend.resources;
 
-import com.demo.rtc.services.IdentityService;
-import com.demo.rtc.services.impl.IdentityServiceImpl;
-import com.demo.rtc.services.objects.UserInfo;
+import com.education.backend.resources.vos.LoginRequestVO;
+import com.education.backend.resources.vos.SignupRequestVO;
+import com.education.backend.services.IdentityService;
+import com.education.backend.services.impl.IdentityServiceImpl;
+import com.education.backend.services.objects.UserInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.*;
@@ -54,7 +56,7 @@ public class IdentityResource {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             SignupRequestVO signupRequestVO = objectMapper.readValue(requestJsonStr, SignupRequestVO.class);
-            boolean isUserRegistered = identityService.getUserRegistration(signupRequestVO.getEmail());
+            boolean isUserRegistered = identityService.findUser(signupRequestVO.getEmail());
             if (isUserRegistered) {
                 FailureResponse failureResponse = new FailureResponse(
                         Response.Status.BAD_REQUEST.getStatusCode(),

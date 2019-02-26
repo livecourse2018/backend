@@ -1,20 +1,16 @@
-package com.demo.rtc.resources;
+package com.education.backend.db.model;
 
-public class SignupRequestVO {
+public class User {
     private String firstName;
     private String lastName;
     private String displayName;
     private String email;
-    private String password;
 
-    public SignupRequestVO(){};
-
-    public SignupRequestVO(String firstName, String lastName, String displayName, String email, String password) {
+    public User(String firstName, String lastName, String displayName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.displayName = displayName;
         this.email = email;
-        this.password = password;
     }
 
     public String getFirstName() {
@@ -31,9 +27,5 @@ public class SignupRequestVO {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 }
