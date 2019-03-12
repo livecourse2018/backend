@@ -6,6 +6,8 @@ import com.education.backend.resources.vos.CourseVO;
 import com.education.backend.services.ContentService;
 import com.education.backend.db.model.CourseRegistration;
 
+import java.util.List;
+
 public class ContentServiceImpl implements ContentService {
     DBClient dbClient = new DBDao();
 
@@ -27,5 +29,10 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public boolean uploadCourse(CourseVO courseVO) {
         return dbClient.uploadCourse(courseVO);
+    }
+
+    @Override
+    public List<CourseVO> getAllCourses() {
+        return dbClient.getCoursesList();
     }
 }

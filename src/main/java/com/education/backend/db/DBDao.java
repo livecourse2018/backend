@@ -4,6 +4,8 @@ import com.education.backend.db.model.User;
 import com.education.backend.resources.vos.CourseVO;
 import com.education.backend.resources.vos.SignupRequestVO;
 import com.education.backend.db.model.CourseRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,9 +28,11 @@ public class DBDao implements DBClient {
     private PreparedStatement preparedStatement;
     private ResultSet resultSet;
 
+    private static final Logger logger = LoggerFactory.getLogger(DBClient.class);
+
     @Override
     public User loginWithPassword(String email, String password) {
-        prepareDatabase();
+        prepareDatabase("login");
         String sqlQuery = "SELECT first_name, last_name, display_name, email FROM user WHERE email='"
                 + email
                 + "' and password='"
@@ -39,7 +43,7 @@ public class DBDao implements DBClient {
 
     @Override
     public boolean signupWithPassword(SignupRequestVO signupRequestVO) {
-        prepareDatabase();
+        prepareDatabase("signup");
         String sqlQuery = "INSERT INTO user (first_name, last_name, display_name, email, password) VALUES ('"
                 + signupRequestVO.getFirstName()
                 + "', '"
@@ -56,7 +60,7 @@ public class DBDao implements DBClient {
 
     @Override
     public CourseRegistration getRegisteredCourses(String email) {
-        prepareDatabase();
+        prepareDatabase("get registered courses");
         String sqlQuery = "SELECT course_id FROM registration WHERE email='"
                 + email
                 + "';";
@@ -65,7 +69,7 @@ public class DBDao implements DBClient {
 
     @Override
     public boolean registerCourse(String email, String courseId) {
-        prepareDatabase();
+        prepareDatabase("user course registration");
         String sqlQuery = "INSERT INTO registration (email, course_id) VALUES ('"
                 + email
                 + "', '"
@@ -76,7 +80,7 @@ public class DBDao implements DBClient {
 
     @Override
     public boolean uploadCourse(CourseVO courseVO) {
-        prepareDatabase();
+        prepareDatabase("upload course");
         String sqlQuery = "INSERT INTO course (course_id, course_name, teacher, start_date, end_date, start_time, end_time, description) VALUES ('"
                 + courseVO.getCourseId()
                 + "', '"
@@ -99,7 +103,7 @@ public class DBDao implements DBClient {
 
     @Override
     public boolean getUserCourseRegistrationStatus(String email, String courseId) {
-        prepareDatabase();
+        prepareDatabase("get user course registration status");
         String sqlQuery = "SELECT * FROM registration WHERE email='"
                 + email
                 + "' and course_id='"
@@ -110,11 +114,18 @@ public class DBDao implements DBClient {
 
     @Override
     public User findUser(String email) {
-        prepareDatabase();
+        prepareDatabase("find user");
         String sqlQuery = "SELECT first_name, last_name, display_name, email FROM user WHERE email='"
                 + email
                 + "';";
         return getUserInfo(sqlQuery);
+    }
+
+    @Override
+    public List<CourseVO> getCoursesList() {
+        prepareDatabase("get course list");
+        String sqlQuery = "SELECT * FROM course;";
+        return getAllCourses(sqlQuery);
     }
 
     private Connection getConnection(boolean dbExisted) {
@@ -171,11 +182,13 @@ public class DBDao implements DBClient {
         return false;
     }
 
-    private void prepareDatabase() {
+    private void prepareDatabase(String tag) {
+        logger.info(String.format("Trying to connect database for '%s'", tag));
         createDatabase();
         createUserTable();
         createCourseTable();
         createRegistrationTable();
+        logger.info(String.format("Successfully connected to database for '%s'", tag));
     }
 
     private void createDatabase() {
@@ -229,6 +242,33 @@ public class DBDao implements DBClient {
                         resultSet.getString("display_name"),
                         resultSet.getString("email"));
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbClose(connection, preparedStatement, resultSet, properties);
+        }
+        return null;
+    }
+
+    private List<CourseVO> getAllCourses(String sqlQuery) {
+        try {
+            connection = getConnection(true);
+            preparedStatement = connection.prepareStatement(sqlQuery);
+            resultSet = runQuery(preparedStatement);
+
+            List<CourseVO> courseList = new ArrayList<>();
+            while (resultSet.next()) {
+                courseList.add(new CourseVO(
+                        resultSet.getString("course_id"),
+                        resultSet.getString("course_name"),
+                        resultSet.getString("teacher"),
+                        resultSet.getString("start_date"),
+                        resultSet.getString("end_date"),
+                        resultSet.getString("start_time"),
+                        resultSet.getString("end_time"),
+                        resultSet.getString("description")));
+            }
+            return courseList;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

@@ -5,6 +5,8 @@ import com.education.backend.resources.vos.CourseVO;
 import com.education.backend.resources.vos.SignupRequestVO;
 import com.education.backend.db.model.CourseRegistration;
 
+import java.util.List;
+
 public interface DBClient {
     User loginWithPassword(String email, String password);
 
@@ -19,4 +21,6 @@ public interface DBClient {
     boolean getUserCourseRegistrationStatus(String email, String courseId);
 
     User findUser(String email);
+
+    List<CourseVO> getCoursesList();
 }
