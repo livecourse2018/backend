@@ -4,6 +4,8 @@ import com.education.backend.db.model.User;
 import com.education.backend.resources.vos.CourseVO;
 import com.education.backend.resources.vos.SignupRequestVO;
 import com.education.backend.db.model.CourseRegistration;
+import com.education.backend.resources.vos.TeacherRegistrationRequestVO;
+import com.education.backend.services.objects.TeacherInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,7 @@ public class DBDao implements DBClient {
     private static final String DB_PASSWORD = "!QA2ws3ed";
     private static final String DB_NAME = "education";
     private static final String TABLE_USER = "user";
+    private static final String TABLE_TEACHER = "teacher";
     private static final String TABLE_COURSE = "course";
     private static final String TABLE_REGISTRATION = "registration";
 
@@ -122,6 +125,41 @@ public class DBDao implements DBClient {
     }
 
     @Override
+    public TeacherInfo findTeacher(String email) {
+        prepareDatabase("find teacher");
+        String sqlQuery = "SELECT first_name, last_name, display_name, email, description FROM teacher WHERE email='"
+                + email
+                + "';";
+        return getTeacherInfo(sqlQuery);
+    }
+
+    @Override
+    public List<TeacherInfo> getTeachersList() {
+        prepareDatabase("get teacher list");
+        String sqlQuery = "SELECT * FROM teacher;";
+        return getAllTeachers(sqlQuery);
+    }
+
+    @Override
+    public boolean signupAsTeacher(TeacherRegistrationRequestVO teacherRegistrationRequestVO) {
+        prepareDatabase("registration as teacher");
+        String sqlQuery = "INSERT INTO teacher (first_name, last_name, display_name, email, password, description) VALUES ('"
+                + teacherRegistrationRequestVO.getFirstName()
+                + "', '"
+                + teacherRegistrationRequestVO.getLastName()
+                + "', '"
+                + teacherRegistrationRequestVO.getDisplayName()
+                + "', '"
+                + teacherRegistrationRequestVO.getEmail()
+                + "', '"
+                + teacherRegistrationRequestVO.getPassword()
+                + "', '"
+                + teacherRegistrationRequestVO.getDescription()
+                + "');";
+        return runUpdate(preparedStatement, sqlQuery, true);
+    }
+
+    @Override
     public List<CourseVO> getCoursesList() {
         prepareDatabase("get course list");
         String sqlQuery = "SELECT * FROM course;";
@@ -186,6 +224,7 @@ public class DBDao implements DBClient {
         logger.info(String.format("Trying to connect database for '%s'", tag));
         createDatabase();
         createUserTable();
+        createTeacherTable();
         createCourseTable();
         createRegistrationTable();
         logger.info(String.format("Successfully connected to database for '%s'", tag));
@@ -205,6 +244,18 @@ public class DBDao implements DBClient {
                 + "   display_name    VARCHAR(500),"
                 + "   PRIMARY KEY (email))";
         runUpdate(preparedStatement, sqlCreateUserTable, true);
+    }
+
+    private void createTeacherTable() {
+        String sqlCreateTeacherTable = "CREATE TABLE IF NOT EXISTS " + TABLE_TEACHER
+                + "  (email           VARCHAR(500),"
+                + "   password        VARCHAR(500),"
+                + "   last_name       VARCHAR(500),"
+                + "   first_name      VARCHAR(500),"
+                + "   display_name    VARCHAR(500),"
+                + "   description    VARCHAR(5000),"
+                + "   PRIMARY KEY (email))";
+        runUpdate(preparedStatement, sqlCreateTeacherTable, true);
     }
 
     private void createCourseTable() {
@@ -250,6 +301,28 @@ public class DBDao implements DBClient {
         return null;
     }
 
+    private TeacherInfo getTeacherInfo(String sqlQuery) {
+        try {
+            connection = getConnection(true);
+            preparedStatement = connection.prepareStatement(sqlQuery);
+            resultSet = runQuery(preparedStatement);
+
+            if (resultSet.first()) {
+                return new TeacherInfo(
+                        resultSet.getString("email"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("display_name"),
+                        resultSet.getString("description"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbClose(connection, preparedStatement, resultSet, properties);
+        }
+        return null;
+    }
+
     private List<CourseVO> getAllCourses(String sqlQuery) {
         try {
             connection = getConnection(true);
@@ -269,6 +342,30 @@ public class DBDao implements DBClient {
                         resultSet.getString("description")));
             }
             return courseList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbClose(connection, preparedStatement, resultSet, properties);
+        }
+        return null;
+    }
+
+    private List<TeacherInfo> getAllTeachers(String sqlQuery) {
+        try {
+            connection = getConnection(true);
+            preparedStatement = connection.prepareStatement(sqlQuery);
+            resultSet = runQuery(preparedStatement);
+
+            List<TeacherInfo> teacherList = new ArrayList<>();
+            while (resultSet.next()) {
+                teacherList.add(new TeacherInfo(
+                        resultSet.getString("email"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("display_name"),
+                        resultSet.getString("description")));
+            }
+            return teacherList;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
